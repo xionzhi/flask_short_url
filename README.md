@@ -28,7 +28,7 @@ url       |    y     |  url地址
 > Request:
         
     {
-        "short_url": "https://github.com/xionzhi"
+        "url": "https://github.com/xionzhi"
     }
 
 
