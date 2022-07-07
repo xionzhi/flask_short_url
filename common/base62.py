@@ -52,3 +52,6 @@ class Base62:
         if check > 0 or len(str62) == 0 or not isinstance(str62, str):
             raise TypeError('base62 number error')
         return self.__62to10(str62)
+
+
+code = Base62()

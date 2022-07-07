@@ -10,7 +10,7 @@
 """
 
 from flask import request, redirect, jsonify
-from common.base62 import Base62
+from common.base62 import code
 from common.validate import url_validate
 
 from service import (app, db, redis_store)
@@ -24,12 +24,12 @@ def decoding_url(base_62):
     _url = redis_store.get(f'DIABLO_SHORT:{base_62}')
     if not _url:
         short_query = db.session.query(DiabloShortUrlModel). \
-            filter(DiabloShortUrlModel.base62 == base_62).first()
+            filter(DiabloShortUrlModel.id == code.decode_62to10(base_62)).first()
         if not short_query:
-            return '', 400
+            return '', 404
 
         _url = short_query.url
-        redis_store.set(f'DIABLO_SHORT:{base_62}', _url, nx=True, ex=300)
+        redis_store.set(f'DIABLO_SHORT:{base_62}', _url, nx=True, ex=600)
 
     return redirect(_url, code=301)
 
@@ -61,7 +61,6 @@ def short_url():
             if isinstance(short_query.id, int) is False:
                 return jsonify(msg=f'{short_query.id}', code=500), 500
 
-            code = Base62()
             base_62 = code.encode_10to62(short_query.id)
             short_query.base62 = base_62
 
@@ -76,4 +75,4 @@ def short_url():
 
     _short_url = f'{app.config["HOST"]}/{base_62}'
 
-    return jsonify(dict(short_url=_short_url))
+    return jsonify(dict(short_url=_short_url, code=200)), 200
