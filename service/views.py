@@ -23,12 +23,12 @@ def decoding_url(base_62):
 
     _url = redis_store.get(f'DIABLO_SHORT:{base_62}')
     if not _url:
-        short_query = db.session.query(DiabloShortUrlModel). \
+        short_query = db.session.query(DiabloShortUrlModel.reverse_url). \
             filter(DiabloShortUrlModel.id == code.decode_62to10(base_62)).first()
         if not short_query:
             return '', 404
 
-        _url = short_query.url
+        _url = short_query.reverse_url[::-1]
         redis_store.set(f'DIABLO_SHORT:{base_62}', _url, nx=True, ex=600)
 
     return redirect(_url, code=301)
@@ -40,21 +40,21 @@ def short_url():
         if not url:
             return jsonify(dict(msg=f'not url', code=400)), 400
     except Exception as e:
-        return jsonify(dict(msg=f'not url', code=400)), 400
+        return jsonify(dict(msg=f'json body', code=400)), 400
 
     if not url_validate(url):
-        return jsonify(dict(msg=f'not url', code=400)), 400
+        return jsonify(dict(msg=f'http url', code=400)), 400
 
     reverse_url = url[::-1]
 
     try:
-        short_query = db.session.query(DiabloShortUrlModel). \
+        short_query = db.session.query(DiabloShortUrlModel.base_62). \
             filter(DiabloShortUrlModel.reverse_url == reverse_url).first()
         if short_query:
             base_62 = short_query.base62
 
         else:
-            short_query = DiabloShortUrlModel(base62='', url=url, reverse_url=reverse_url)
+            short_query = DiabloShortUrlModel(base62='', reverse_url=reverse_url)
             db.session.add(short_query)
             db.session.flush()
 

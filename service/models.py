@@ -17,5 +17,4 @@ class DiabloShortUrlModel(db.Model):
 
     id = db.Column(db.INTEGER, primary_key=True, autoincrement=True)
     base62 = db.Column(db.VARCHAR(64), comment='短链接key')
-    url = db.Column(db.VARCHAR(1024), comment='长链接地址')
-    reverse_url = db.Column(db.VARCHAR(1024), index=True, comment='长链接地址反转')
+    reverse_url = db.Column(db.VARCHAR(1024), index=True, comment='长链接反转 index len 32')
