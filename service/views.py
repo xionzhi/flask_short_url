@@ -35,12 +35,9 @@ def decoding_url(base_62):
 
 
 def short_url():
-    try:
-        url = request.json.get('url')
-        if not url:
-            return jsonify(dict(msg=f'not url', code=400)), 400
-    except Exception as e:
-        return jsonify(dict(msg=f'json body', code=400)), 400
+    url = request.json.get('url')
+    if not url:
+        return jsonify(dict(msg=f'not url', code=400)), 400
 
     if not url_validate(url):
         return jsonify(dict(msg=f'http url', code=400)), 400
@@ -63,9 +60,7 @@ def short_url():
 
             base_62 = code.encode_10to62(short_query.id)
             short_query.base62 = base_62
-
             db.session.commit()
-
     except Exception as e:
         db.session.rollback()
         return jsonify(dict(msg=f'{e}', code=500)), 500
